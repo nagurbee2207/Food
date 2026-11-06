@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   X,
   MapPin,
@@ -11,16 +11,28 @@ import {
   Thermometer,
   ShieldCheck,
   Flame,
-  ArrowRight
+  ArrowRight,
+  XCircle,
+  AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useFoodListing } from '../context/FoodListingContext';
 
 export const FoodDetailModal = ({ item, onClose, onClaim }) => {
   if (!item) return null;
 
-  const { currentUser } = useAuth();
+  const { currentUser, isAdmin } = useAuth();
+  const { cancelClaim } = useFoodListing();
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   const isAvailable = item.status === 'available';
+  const isClaimed = item.status === 'claimed';
+
+  const handleCancelReservation = () => {
+    cancelClaim(item.id, 'Reservation cancelled from details view');
+    alert('Reservation cancelled. The food has been released back to the public feed.');
+    onClose();
+  };
 
   const getTimeRemaining = (expiresAt) => {
     if (!expiresAt) return 'No expiry provided';
@@ -150,7 +162,7 @@ export const FoodDetailModal = ({ item, onClose, onClaim }) => {
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
+        <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
           <button
             onClick={onClose}
             className="px-5 py-2.5 rounded-2xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-colors"
@@ -169,6 +181,37 @@ export const FoodDetailModal = ({ item, onClose, onClaim }) => {
               <span>Claim This Surplus Food</span>
               <ArrowRight className="w-4 h-4" />
             </button>
+          ) : isClaimed ? (
+            <div className="flex items-center gap-2">
+              {!showCancelConfirm ? (
+                <button
+                  type="button"
+                  onClick={() => setShowCancelConfirm(true)}
+                  className="px-4 py-2.5 rounded-2xl bg-rose-50 border border-rose-200 hover:bg-rose-100 text-rose-700 font-bold text-xs flex items-center gap-1.5 transition-colors"
+                >
+                  <XCircle className="w-4 h-4 text-rose-600" />
+                  <span>Cancel Reservation</span>
+                </button>
+              ) : (
+                <div className="flex items-center gap-2 bg-rose-50 border border-rose-200 p-1.5 rounded-xl text-xs">
+                  <span className="text-rose-800 font-bold text-[11px] px-1">Release food?</span>
+                  <button
+                    type="button"
+                    onClick={handleCancelReservation}
+                    className="px-3 py-1 bg-rose-600 text-white rounded-lg font-bold text-xs"
+                  >
+                    Yes, Release
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowCancelConfirm(false)}
+                    className="px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded-lg text-xs"
+                  >
+                    No
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <div className="text-xs font-bold text-slate-500">
               This donation is currently locked or fulfilled.

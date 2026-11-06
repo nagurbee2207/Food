@@ -381,3 +381,4 @@ export const AuthModal = ({ isOpen, onClose }) => {
     </div>
   );
 };
+

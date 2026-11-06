@@ -255,6 +255,25 @@ export const claimFoodListing = (listingId, recipientUser, claimDetails = {}) =>
   return listings[index];
 };
 
+// Cancel claim / release food back to available status
+export const cancelFoodClaim = (listingId, reason = '') => {
+  const listings = getFoodListings();
+  const index = listings.findIndex(l => l.id === listingId);
+
+  if (index === -1) {
+    throw new Error('Listing not found.');
+  }
+
+  listings[index].status = 'available';
+  listings[index].claimedBy = null;
+  listings[index].claimId = null;
+  listings[index].cancelledAt = new Date().toISOString();
+  listings[index].cancelReason = reason || 'Reservation cancelled by charity partner';
+
+  saveFoodListings(listings);
+  return listings[index];
+};
+
 // Update status of claim / distribution (e.g. claimed -> picked_up -> distributed)
 export const updateListingStatus = (listingId, newStatus) => {
   const listings = getFoodListings();

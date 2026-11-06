@@ -377,3 +377,4 @@ export const PostFoodModal = ({ isOpen, onClose }) => {
     </div>
   );
 };
+

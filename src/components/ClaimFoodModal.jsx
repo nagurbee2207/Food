@@ -251,3 +251,4 @@ export const ClaimFoodModal = ({ item, isOpen, onClose, onClaimSuccess }) => {
     </div>
   );
 };
+

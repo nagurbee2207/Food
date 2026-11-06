@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   X,
   QrCode,
@@ -11,17 +11,27 @@ import {
   Truck,
   Leaf,
   ShieldCheck,
-  Utensils
+  Utensils,
+  AlertTriangle,
+  XCircle
 } from 'lucide-react';
 import { useFoodListing } from '../context/FoodListingContext';
 
 export const PickupPassModal = ({ item, onClose }) => {
   if (!item) return null;
 
-  const { setStatus } = useFoodListing();
+  const { setStatus, cancelClaim } = useFoodListing();
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
 
   const handleUpdateStatus = (newStatus) => {
     setStatus(item.id, newStatus);
+  };
+
+  const handleCancelReservation = () => {
+    cancelClaim(item.id, cancelReason);
+    alert('Reservation cancelled. The surplus food has been released back to the public feed.');
+    onClose();
   };
 
   const handlePrint = () => {
@@ -181,6 +191,53 @@ export const PickupPassModal = ({ item, onClose }) => {
               </button>
             </div>
           </div>
+
+          {/* Cancel Reservation Section */}
+          <div className="pt-2 border-t border-slate-200">
+            {!showCancelConfirm ? (
+              <button
+                type="button"
+                onClick={() => setShowCancelConfirm(true)}
+                className="w-full py-2.5 px-3 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <XCircle className="w-4 h-4 text-rose-600" />
+                <span>Cancel Reservation (Release Food)</span>
+              </button>
+            ) : (
+              <div className="bg-rose-50 border border-rose-200 rounded-2xl p-3.5 space-y-2.5 text-xs animate-in fade-in">
+                <div className="flex items-center gap-2 text-rose-800 font-extrabold">
+                  <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>Confirm Cancellation</span>
+                </div>
+                <p className="text-[11px] text-rose-700">
+                  Are you sure? This will cancel your pickup reservation and immediately return the food listing to the public feed so other charities can claim it.
+                </p>
+                <input
+                  type="text"
+                  placeholder="Optional reason (e.g. vehicle issue, schedule change)"
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  className="w-full px-3 py-1.5 rounded-lg border border-rose-200 bg-white text-xs outline-none focus:border-rose-400"
+                />
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleCancelReservation}
+                    className="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs shadow-sm transition-all"
+                  >
+                    Yes, Cancel Reservation
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowCancelConfirm(false)}
+                    className="px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs"
+                  >
+                    Keep Reservation
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Pass Footer */}
@@ -204,3 +261,4 @@ export const PickupPassModal = ({ item, onClose }) => {
     </div>
   );
 };
+

@@ -8,7 +8,8 @@ import {
   Leaf,
   Eye,
   CheckCircle2,
-  ArrowRight
+  ArrowRight,
+  XCircle
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useFoodListing } from '../context/FoodListingContext';
@@ -17,9 +18,15 @@ export const DonationHistoryModal = ({ isOpen, onClose, onSelectPass }) => {
   if (!isOpen) return null;
 
   const { currentUser } = useAuth();
-  const { listings } = useFoodListing();
+  const { listings, cancelClaim } = useFoodListing();
 
   const [activeTab, setActiveTab] = useState('all');
+
+  const handleCancel = (itemId) => {
+    if (window.confirm('Are you sure you want to cancel this reservation and release the food back to the community?')) {
+      cancelClaim(itemId, 'Reservation cancelled by user from history modal');
+    }
+  };
 
   const filtered = listings.filter((item) => {
     if (activeTab === 'my_donations') {
@@ -145,24 +152,36 @@ export const DonationHistoryModal = ({ isOpen, onClose, onSelectPass }) => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-slate-200 text-xs">
+                <div className="flex flex-wrap items-center justify-between pt-2 border-t border-slate-200 text-xs gap-2">
                   <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
                     <Leaf className="w-3.5 h-3.5" />
                     <span>Rescued {item.servingsCount} meals (-{item.co2SavedKg} kg CO₂)</span>
                   </div>
 
-                  {item.claimedBy && (
-                    <button
-                      onClick={() => {
-                        onSelectPass(item);
-                        onClose();
-                      }}
-                      className="flex items-center gap-1 text-emerald-800 font-bold hover:underline"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>View Pass & Logistics</span>
-                    </button>
-                  )}
+                  <div className="flex items-center gap-3">
+                    {item.status === 'claimed' && (
+                      <button
+                        onClick={() => handleCancel(item.id)}
+                        className="flex items-center gap-1 text-rose-600 font-bold hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-lg border border-rose-200"
+                      >
+                        <XCircle className="w-3.5 h-3.5" />
+                        <span>Cancel Reservation</span>
+                      </button>
+                    )}
+
+                    {item.claimedBy && (
+                      <button
+                        onClick={() => {
+                          onSelectPass(item);
+                          onClose();
+                        }}
+                        className="flex items-center gap-1 text-emerald-800 font-bold hover:underline"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>View Pass & Logistics</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))
@@ -172,3 +191,4 @@ export const DonationHistoryModal = ({ isOpen, onClose, onSelectPass }) => {
     </div>
   );
 };
+

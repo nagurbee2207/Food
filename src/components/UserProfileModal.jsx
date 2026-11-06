@@ -170,3 +170,4 @@ export const UserProfileModal = ({ isOpen, onClose }) => {
     </div>
   );
 };
+

@@ -6,6 +6,7 @@ import {
   updateFoodListing,
   deleteFoodListing,
   claimFoodListing,
+  cancelFoodClaim,
   updateListingStatus,
   getImpactMetrics,
   getPerishableUrgentItems,
@@ -65,6 +66,13 @@ export const FoodListingProvider = ({ children }) => {
     const claimed = claimFoodListing(listingId, recipientUser, claimDetails);
     refreshData();
     return claimed;
+  };
+
+  // Cancel reservation / Release back to available
+  const cancelClaim = (listingId, reason) => {
+    const released = cancelFoodClaim(listingId, reason);
+    refreshData();
+    return released;
   };
 
   // Change fulfillment status (Claimed -> Picked Up -> Distributed)
@@ -139,6 +147,7 @@ export const FoodListingProvider = ({ children }) => {
         editListing,
         removeListing,
         claimListing,
+        cancelClaim,
         setStatus,
         resetCatalog,
         refreshData
@@ -156,3 +165,4 @@ export const useFoodListing = () => {
   }
   return context;
 };
+

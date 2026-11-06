@@ -29,6 +29,7 @@ export const AdminDashboard = ({ onOpenPostModal, onSelectPass }) => {
     filteredListings,
     impactMetrics,
     removeListing,
+    cancelClaim,
     setStatus,
     resetCatalog,
     searchQuery,
@@ -312,13 +313,25 @@ export const AdminDashboard = ({ onOpenPostModal, onSelectPass }) => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <button
                     onClick={() => onSelectPass(item)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100"
                   >
                     <Eye className="w-3.5 h-3.5" />
                     <span>View Pass</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      if (window.confirm('Cancel this reservation and release back to available?')) {
+                        cancelClaim(item.id, 'Reservation cancelled by administrator');
+                      }
+                    }}
+                    className="px-2.5 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold hover:bg-rose-100"
+                    title="Release reservation"
+                  >
+                    Cancel Claim
                   </button>
 
                   <select
@@ -418,3 +431,4 @@ export const AdminDashboard = ({ onOpenPostModal, onSelectPass }) => {
     </div>
   );
 };
+
